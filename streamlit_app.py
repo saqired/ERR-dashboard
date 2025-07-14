@@ -1,6 +1,12 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 
-#Read an Excel file
-df = pd.read_excel('Extrusion Rejection Record (10A_Jeff_250710).xlsx')
-print(df.head())
+#Sample data
+data = pd.DataFrame({
+  'x': range(10),
+  'y': np.random.randint(1,100,10)
+})
+
+#Line chart
+st.line_chart(data.set_index('x'))
