@@ -9,4 +9,4 @@ data = pd.DataFrame({
 })
 
 #Line chart
-st.line_chart(data.set_index('x'))
+st.bar_chart(data.set_index('x'))
