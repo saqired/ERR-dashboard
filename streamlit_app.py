@@ -1,11 +1,8 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
-# --- Page setup ---
-st.set_page_config(page_title="Sales Dashboard", layout="centered")
-
-# --- Title ---
+# --- Page Setup ---
+st.set_page_config(page_title="Simple Bar Chart", layout="centered")
 st.title("📊 Product Sales Dashboard")
 
 # --- Sample Data ---
@@ -15,24 +12,13 @@ data = {
 }
 df = pd.DataFrame(data)
 
-# --- Show Data Table ---
+# --- Show Table ---
 st.subheader("🧾 Sales Table")
 st.dataframe(df, use_container_width=True)
 
-# --- Plotly Bar Chart ---
-st.subheader("📈 Sales Bar Chart")
-fig = px.bar(
-    df,
-    x='Product',
-    y='Sales',
-    text='Sales',
-    color='Product',
-    title="Product Sales Overview",
-    labels={'Sales': 'Units Sold'},
-    template='plotly_white'
-)
-fig.update_traces(textposition='outside')
-fig.update_layout(yaxis=dict(title='Units Sold'), xaxis=dict(title='Product'))
+# --- Convert to Streamlit's chart format ---
+df_chart = df.set_index('Product')
 
-# --- Display Chart ---
-st.plotly_chart(fig, use_container_width=True)
+# --- Show Bar Chart ---
+st.subheader("📈 Sales Bar Chart")
+st.bar_chart(df_chart)
