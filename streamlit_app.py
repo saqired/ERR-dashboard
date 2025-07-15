@@ -2,33 +2,37 @@ import streamlit as st
 import pandas as pd
 import time
 
-# --- Page setup ---
-st.set_page_config(page_title="Live Defect Dashboard", layout="wide")
-st.title("📊 Live Defect Dashboard (Google Sheets Connected)")
+# --- Page Setup ---
+st.set_page_config(page_title="Live Defect Dashboard", layout="centered")
+st.title("🛠️ Live Defect Dashboard (Google Sheets)")
 
-# --- Google Sheets CSV URLs ---
-sheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuotFDwz3Gs5cVnYjcMhPovYHUpMsVe6LdHHUIDSJcYVVfII1pVWBXZUriMqEbim6Bs8diKBn9glc7/pub?gid=1029560887&single=true&output=csv"
+# --- Google Sheet URL (CSV export format) ---
+sheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuotFDwz3Gs5cVnYjcMhPovYHUpMsVe6LdHHUIDSJcYVVfII1pVWBXZUriMqEbim6Bs8diKBn9glc7/pub?output=csv"
 
-# --- Auto-refresh loop ---
+# --- Refresh interval ---
 refresh_interval = 10  # seconds
 
+# --- Live Refresh Loop ---
 while True:
     try:
-        # --- Load both sheets ---
-        df_summary = pd.read_csv(url_summary)
-        df_press10a = pd.read_csv(url_press10a)
+        # --- Load Google Sheet data ---
+        df = pd.read_csv(sheet_url)
 
-        # --- Section 1: Total Defects Summary ---
-        st.subheader("📊 Total Number vs. Defects (Summarized)")
-        if 'Defect' in df_summary.columns and 'Total' in df_summary.columns:
-            st.bar_chart(df_summary.set_index('Defect'))
-        st.dataframe(df_summary, use_container_width=True)
+        # --- Check required columns ---
+        if 'Defect' not in df.columns or 'Total' not in df.columns:
+            st.error("❗ The sheet must include 'Defect' and 'Total' columns.")
+            break
 
-        st.markdown("---")
+        # --- Format data ---
+        df_chart = df[['Defect', 'Total']].set_index('Defect')
 
-        # --- Section 2: Press10A Defect Breakdown ---
-        st.subheader("📋 Defect Summary by Alloy (Press10A)")
-        st.dataframe(df_press10a, use_container_width=True)
+        # --- Bar Chart ---
+        st.subheader("📊 Total Number vs. Defects")
+        st.bar_chart(df_chart)
+
+        # --- Full Table ---
+        st.subheader("📋 Defect Data Table")
+        st.dataframe(df, use_container_width=True)
 
         # --- Footer ---
         st.caption(f"🔄 Auto-refreshing every {refresh_interval} seconds...")
@@ -36,5 +40,5 @@ while True:
         st.rerun()
 
     except Exception as e:
-        st.error(f"❌ Error: {e}")
+        st.error(f"❌ Failed to load or process the sheet: {e}")
         break
