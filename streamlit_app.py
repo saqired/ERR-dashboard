@@ -1,12 +1,13 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
 import time
 
 # --- Page Setup ---
 st.set_page_config(page_title="Live Defect Dashboard", layout="centered")
 st.title("🛠️ Live Defect Dashboard (Google Sheets)")
 
-# --- Google Sheets CSV URL ---
+# --- Google Sheet URL ---
 sheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuotFDwz3Gs5cVnYjcMhPovYHUpMsVe6LdHHUIDSJcYVVfII1pVWBXZUriMqEbim6Bs8diKBn9glc7/pub?output=csv"
 
 # --- Refresh interval ---
@@ -14,7 +15,7 @@ refresh_interval = 10  # seconds
 
 while True:
     try:
-        # --- Load entire sheet ---
+        # --- Load full sheet ---
         full_df = pd.read_csv(sheet_url)
 
         # --- Table 1: Defect Summary for Bar Chart ---
@@ -25,19 +26,37 @@ while True:
         raw_table = full_df.iloc[20:].dropna(how='all')  # adjust 20 if needed
         raw_table = raw_table.reset_index(drop=True)
         raw_table.columns = raw_table.iloc[0]  # Use first row as column names
-        df_table1 = raw_table[1:].copy()  # Actual data starts after that
-        df_table1 = df_table1.apply(pd.to_numeric, errors='ignore')  # Convert to numeric where possible
-        df_table1 = df_table1.dropna(axis=1, how='all')  # Drop empty columns
+        df_table1 = raw_table[1:].copy()
+        df_table1 = df_table1.apply(pd.to_numeric, errors='ignore')
+        df_table1 = df_table1.dropna(axis=1, how='all')
 
-        # --- Display Section 1: Bar Chart ---
-        st.subheader("📊 Total Number vs. Defects")
-        st.bar_chart(df_chart_clean)
+        # --- Section 1: Bar Chart with Labels (Altair) ---
+        st.subheader("📊 Total Number vs. Defects (with labels)")
 
-        # --- Display Section 2: Raw Defect Summary Table ---
+        bar_chart = alt.Chart(df_chart_clean.reset_index()).mark_bar().encode(
+            x=alt.X('Defects:N', title='Defects'),
+            y=alt.Y('Total Number:Q', title='Total Count'),
+            tooltip=['Defects', 'Total Number']
+        ).properties(
+            width=600,
+            height=400
+        )
+
+        text = bar_chart.mark_text(
+            align='center',
+            baseline='bottom',
+            dy=-2
+        ).encode(
+            text='Total Number:Q'
+        )
+
+        st.altair_chart(bar_chart + text, use_container_width=True)
+
+        # --- Section 2: Defect Summary Table ---
         st.subheader("📋 Defect Summary Table")
         st.dataframe(df_chart, use_container_width=True)
 
-        # --- Display Section 3: Table1 - Defects by Alloy-Temper ---
+        # --- Section 3: Table1 - Defect by Alloy-Temper ---
         st.subheader("📋 Table1: Defect Count by Alloy-Temper")
         st.dataframe(df_table1, use_container_width=True)
 
