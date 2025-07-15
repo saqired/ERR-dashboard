@@ -23,17 +23,19 @@ while True:
         df_chart_clean = df_chart.set_index('Defects')
 
         # --- Table 2: Defect by Alloy-Temper (starts around row 20) ---
-        raw_table = full_df.iloc[20:].dropna(how='all')  # adjust 20 if needed
+        raw_table = full_df.iloc[20:].dropna(how='all')  # adjust if needed
         raw_table = raw_table.reset_index(drop=True)
         raw_table.columns = raw_table.iloc[0]  # Use first row as column names
         df_table1 = raw_table[1:].copy()
         df_table1 = df_table1.apply(pd.to_numeric, errors='ignore')
         df_table1 = df_table1.dropna(axis=1, how='all')
 
-        # --- Section 1: Bar Chart with Labels (Altair) ---
+        # --- Section 1: Bar Chart with Labels ---
         st.subheader("📊 Total Number vs. Defects (with labels)")
 
-        bar_chart = alt.Chart(df_chart_clean.reset_index()).mark_bar().encode(
+        chart_data = df_chart_clean.reset_index()
+
+        bar = alt.Chart(chart_data).mark_bar().encode(
             x=alt.X('Defects:N', title='Defects'),
             y=alt.Y('Total Number:Q', title='Total Count'),
             tooltip=['Defects', 'Total Number']
@@ -42,15 +44,16 @@ while True:
             height=400
         )
 
-        text = bar_chart.mark_text(
+        labels = bar.mark_text(
             align='center',
             baseline='bottom',
-            dy=-2
+            dy=-5,
+            fontSize=12
         ).encode(
-            text='Total Number:Q'
+            text=alt.Text('Total Number:Q')
         )
 
-        st.altair_chart(bar_chart + text, use_container_width=True)
+        st.altair_chart(bar + labels, use_container_width=True)
 
         # --- Section 2: Defect Summary Table ---
         st.subheader("📋 Defect Summary Table")
