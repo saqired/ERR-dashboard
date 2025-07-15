@@ -22,7 +22,7 @@ while True:
         df_chart = full_df[['Defects', 'Total Number']].dropna()
         df_chart_clean = df_chart.set_index('Defects')
 
-        # --- Table 2: Defect by Alloy-Temper (starts around row 20) ---
+        # --- Table 2: Defect by Alloy-Temper ---
         raw_table = full_df.iloc[20:].dropna(how='all')  # adjust if needed
         raw_table = raw_table.reset_index(drop=True)
         raw_table.columns = raw_table.iloc[0]  # Use first row as column names
