@@ -21,11 +21,19 @@ while True:
         df_chart = full_df[['Defects', 'Total Number']].dropna()
         df_chart_clean = df_chart.set_index('Defects')
 
-        # --- Table 2: Defect by Alloy-Temper (starts around row 20+) ---
-        df_table1 = full_df.iloc[20:].dropna(how='all')  # adjust starting row if needed
-        df_table1.columns = df_table1.iloc[0]  # use first row as header
-        df_table1 = df_table1[1:]  # drop header row from data
-        df_table1.reset_index(drop=True, inplace=True)
+        # --- Table 2: Defect by Alloy-Temper (starts at row 20+) ---
+raw_table = full_df.iloc[20:].dropna(how='all')  # adjust 20 if needed
+raw_table = raw_table.reset_index(drop=True)
+
+# Reset column names using the first row of the sliced data
+raw_table.columns = raw_table.iloc[0]
+df_table1 = raw_table[1:].copy()
+
+# Convert columns to appropriate types safely
+df_table1 = df_table1.apply(pd.to_numeric, errors='ignore')
+
+# Drop completely empty columns (if any)
+df_table1 = df_table1.dropna(axis=1, how='all')
 
         # --- Section 1: Bar Chart ---
         st.subheader("📊 Total Number vs. Defects")
