@@ -19,12 +19,12 @@ while True:
         df = pd.read_csv(sheet_url)
 
         # --- Check required columns ---
-        if 'Defect' not in df.columns or 'Total' not in df.columns:
-            st.error("❗ The sheet must include 'Defect' and 'Total' columns.")
+        if 'Defects' not in df.columns or 'Total Number' not in df.columns:
+            st.error("❗ The sheet must include 'Defects' and 'Total Number' columns.")
             break
 
         # --- Format data ---
-        df_chart = df[['Defect', 'Total']].set_index('Defect')
+        df_chart = df[['Defects', 'Total Number']].set_index('Defects')
 
         # --- Bar Chart ---
         st.subheader("📊 Total Number vs. Defects")
