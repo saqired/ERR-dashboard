@@ -31,7 +31,7 @@ while True:
         df_table1 = df_table1.dropna(axis=1, how='all')
 
         # --- Section 1: Bar Chart with Labels ---
-        st.subheader("📊 Total Number vs. Defects (with labels)")
+        st.subheader("📊 Total Number vs. Defects")
 
         chart_data = df_chart_clean.reset_index()
 
