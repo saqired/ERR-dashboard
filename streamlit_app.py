@@ -5,7 +5,7 @@ import time
 
 # --- Page Setup ---
 st.set_page_config(page_title="Live Defect Dashboard", layout="centered")
-st.title("🛠️ Live Defect Dashboard (Google Sheets)")
+st.title("🛠️ Live Defect Dashboard")
 
 # --- Google Sheet CSV Export URL ---
 sheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuotFDwz3Gs5cVnYjcMhPovYHUpMsVe6LdHHUIDSJcYVVfII1pVWBXZUriMqEbim6Bs8diKBn9glc7/pub?output=csv"
@@ -34,7 +34,7 @@ while True:
         df_table2 = df_table2.dropna(axis=1, how='all')
 
         # --- Section 1: Bar Chart with Color & Labels ---
-        st.subheader("📊 Total Number vs. Defects (Multi-Colored)")
+        st.subheader("📊 Total Number vs. Defects")
 
         bar = alt.Chart(chart_data).mark_bar().encode(
             x=alt.X('Defects:N', title='Defects'),
