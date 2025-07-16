@@ -20,22 +20,23 @@ while True:
 
         # --- Table 1: Defect Summary for Bar Chart ---
         df_chart = full_df[['Defects', 'Total Number']].dropna()
+        df_chart['Total Number'] = pd.to_numeric(df_chart['Total Number'], errors='coerce')
         df_chart_clean = df_chart.set_index('Defects')
 
         # --- Table 2: Defect by Alloy-Temper (starts around row 20) ---
-        raw_table = full_df.iloc[20:].dropna(how='all')  # Adjust row if needed
+        raw_table = full_df.iloc[20:].dropna(how='all')
         raw_table = raw_table.reset_index(drop=True)
-        raw_table.columns = raw_table.iloc[0]  # Use first row as header
+        raw_table.columns = raw_table.iloc[0]
         df_table1 = raw_table[1:].copy()
         df_table1 = df_table1.apply(pd.to_numeric, errors='ignore')
         df_table1 = df_table1.dropna(axis=1, how='all')
 
-        # --- Section 1: Bar Chart with Value Labels ---
+        # --- Section 1: Bar Chart with Visible Labels ---
         st.subheader("📊 Total Number vs. Defects")
 
         chart_data = df_chart_clean.reset_index()
-        chart_data['Total Number'] = pd.to_numeric(chart_data['Total Number'], errors='coerce')
 
+        # Create bar chart
         bar = alt.Chart(chart_data).mark_bar(color='#1f77b4').encode(
             x=alt.X('Defects:N', title='Defects'),
             y=alt.Y('Total Number:Q', title='Total Count')
@@ -44,17 +45,21 @@ while True:
             height=400
         )
 
+        # Add labels - adjusted to ensure visibility
         labels = alt.Chart(chart_data).mark_text(
             align='center',
-            baseline='bottom',
-            dy=-5,
-            fontSize=12
+            baseline='bottom',  # can also try 'top'
+            dy=-10,              # move label slightly above the bar
+            fontSize=14,
+            fontWeight='bold',
+            color='black'
         ).encode(
             x='Defects:N',
             y='Total Number:Q',
             text=alt.Text('Total Number:Q')
         )
 
+        # Combine and render
         st.altair_chart(bar + labels, use_container_width=True)
 
         # --- Section 2: Defect Summary Table ---
