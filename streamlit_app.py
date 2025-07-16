@@ -31,26 +31,27 @@ while True:
         df_table1 = df_table1.apply(pd.to_numeric, errors='ignore')
         df_table1 = df_table1.dropna(axis=1, how='all')
 
-        # --- Section 1: Bar Chart with Visible Labels ---
+        # --- Section 1: Bar Chart with Color and Labels ---
         st.subheader("📊 Total Number vs. Defects")
 
         chart_data = df_chart_clean.reset_index()
 
-        # Create bar chart
-        bar = alt.Chart(chart_data).mark_bar(color='#1f77b4').encode(
+        # Colored bars per defect
+        bar = alt.Chart(chart_data).mark_bar().encode(
             x=alt.X('Defects:N', title='Defects'),
-            y=alt.Y('Total Number:Q', title='Total Count')
+            y=alt.Y('Total Number:Q', title='Total Count'),
+            color=alt.Color('Defects:N', legend=None)  # different color per bar
         ).properties(
             width=600,
             height=400
         )
 
-        # Add labels - adjusted to ensure visibility
+        # Labels on bars
         labels = alt.Chart(chart_data).mark_text(
             align='center',
-            baseline='bottom',  # can also try 'top'
-            dy=-10,              # move label slightly above the bar
-            fontSize=14,
+            baseline='bottom',
+            dy=-10,
+            fontSize=12,
             fontWeight='bold',
             color='black'
         ).encode(
@@ -59,7 +60,6 @@ while True:
             text=alt.Text('Total Number:Q')
         )
 
-        # Combine and render
         st.altair_chart(bar + labels, use_container_width=True)
 
         # --- Section 2: Defect Summary Table ---
