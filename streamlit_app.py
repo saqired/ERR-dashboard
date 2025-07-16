@@ -5,7 +5,7 @@ import time
 
 # --- Page Setup ---
 st.set_page_config(page_title="Live Defect Dashboard", layout="centered")
-st.title("🛠️ Live Defect Dashboard (Google Sheets)")
+st.title("🛠️ Live Defect Dashboard")
 
 # --- Google Sheet URL ---
 sheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuotFDwz3Gs5cVnYjcMhPovYHUpMsVe6LdHHUIDSJcYVVfII1pVWBXZUriMqEbim6Bs8diKBn9glc7/pub?output=csv"
@@ -31,7 +31,7 @@ while True:
         df_table1 = df_table1.dropna(axis=1, how='all')
 
         # --- Section 1: Bar Chart with Value Labels ---
-        st.subheader("📊 Total Number vs. Defects (with labels)")
+        st.subheader("📊 Total Number vs. Defects")
 
         chart_data = df_chart_clean.reset_index()
         chart_data['Total Number'] = pd.to_numeric(chart_data['Total Number'], errors='coerce')
