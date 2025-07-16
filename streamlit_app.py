@@ -5,7 +5,7 @@ import time
 
 # --- Page Setup ---
 st.set_page_config(page_title="Live Defect Dashboard", layout="centered")
-st.title("🛠️ Live Defect Dashboard")
+st.title("🛠️ Live Defect Dashboard (Google Sheets)")
 
 # --- Google Sheet URL ---
 sheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuotFDwz3Gs5cVnYjcMhPovYHUpMsVe6LdHHUIDSJcYVVfII1pVWBXZUriMqEbim6Bs8diKBn9glc7/pub?output=csv"
@@ -20,34 +20,28 @@ while True:
 
         # --- Table 1: Defect Summary for Bar Chart ---
         df_chart = full_df[['Defects', 'Total Number']].dropna()
-        df_chart['Defects'] = df_chart['Defects'].astype(str).str.strip()  # ensure clean text
+        df_chart['Defects'] = df_chart['Defects'].astype(str).str.strip()
         df_chart['Total Number'] = pd.to_numeric(df_chart['Total Number'], errors='coerce')
-        df_chart_clean = df_chart.set_index('Defects')
+        df_chart = df_chart.dropna()
 
-        # --- Table 2: Defect by Alloy-Temper (starts around row 20) ---
-        raw_table = full_df.iloc[20:].dropna(how='all')
-        raw_table = raw_table.reset_index(drop=True)
-        raw_table.columns = raw_table.iloc[0]
-        df_table1 = raw_table[1:].copy()
-        df_table1 = df_table1.apply(pd.to_numeric, errors='ignore')
-        df_table1 = df_table1.dropna(axis=1, how='all')
+        # Show debug to confirm defects are valid and unique
+        st.subheader("🧪 Debug: Defect Values")
+        st.write("Unique Defects:", df_chart['Defects'].unique())
 
-        # --- Section 1: Bar Chart with Colored Bars and Labels ---
-        st.subheader("📊 Total Number vs. Defects")
+        chart_data = df_chart.reset_index(drop=True)
 
-        chart_data = df_chart_clean.reset_index()
+        # --- Bar Chart with Different Colors per Defect ---
+        st.subheader("📊 Total Number vs. Defects (Multi-colored with labels)")
 
-        # Bar chart with one color per Defect
         bar = alt.Chart(chart_data).mark_bar().encode(
             x=alt.X('Defects:N', title='Defects'),
             y=alt.Y('Total Number:Q', title='Total Count'),
-            color=alt.Color('Defects:N', title="Defect Type")  # 👈 this makes each bar a different color
+            color=alt.Color('Defects:N', title="Defect Type")  # force unique color per defect
         ).properties(
             width=600,
             height=400
         )
 
-        # Add number labels on bars
         labels = alt.Chart(chart_data).mark_text(
             align='center',
             baseline='bottom',
@@ -61,16 +55,11 @@ while True:
             text='Total Number:Q'
         )
 
-        # Display chart with labels
         st.altair_chart(bar + labels, use_container_width=True)
 
-        # --- Section 2: Defect Summary Table ---
+        # --- Optional: Show raw table
         st.subheader("📋 Defect Summary Table")
         st.dataframe(df_chart, use_container_width=True)
-
-        # --- Section 3: Table1 - Defect by Alloy-Temper ---
-        st.subheader("📋 Table1: Defect Count by Alloy-Temper")
-        st.dataframe(df_table1, use_container_width=True)
 
         # --- Footer ---
         st.caption(f"🔄 Auto-refreshing every {refresh_interval} seconds...")
