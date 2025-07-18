@@ -55,7 +55,7 @@ while True:
             dy=-10,
             fontSize=12,
             fontWeight='bold',
-            color='black'
+            color='white'
         ).encode(
             x='Defects:N',
             y='Total Number:Q',
